@@ -16,4 +16,23 @@ const verifyToken = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { verifyToken };
+const isAgent = (req, res, next) => {
+  const { roleCode } = req.user;
+  if (roleCode !== "ROL1" || roleCode !== "ROL5" || roleCode !== "ROL3")
+    return throwErrorWithStatus(401, "Bạn không có quyền truy cập!", res, next);
+  next();
+};
+
+const isOwner = (req, res, next) => {
+  const { roleCode } = req.user;
+  if (roleCode !== "ROL1" || roleCode !== "ROL3")
+    return throwErrorWithStatus(401, "Bạn không có quyền truy cập!", res, next);
+  next();
+};
+const isAdmin = (req, res, next) => {
+  const { roleCode } = req.user;
+  if (roleCode !== "ROL1")
+    return throwErrorWithStatus(401, "Bạn không có quyền truy cập!", res, next);
+  next();
+};
+module.exports = { verifyToken, isAdmin, isAgent, isOwner };

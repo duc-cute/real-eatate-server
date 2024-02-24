@@ -36,6 +36,8 @@ module.exports = {
           model: "Roles",
           key: "code",
         },
+        defaultValue: "ROLE7",
+        allowNull: false,
       },
       avatar: {
         type: Sequelize.STRING,
