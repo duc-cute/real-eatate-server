@@ -5,7 +5,7 @@ const Joi = require("joi");
 const ctrls = require("../controllers/propertyType");
 const validateDTO = require("../middlewares/validation");
 const { isAdmin, verifyToken } = require("../middlewares/verifyToken");
-const { stringReq } = require("../middlewares/joiSchema");
+const { stringReq, string } = require("../middlewares/joiSchema");
 
 router.post(
   "/create",
@@ -22,5 +22,18 @@ router.post(
   ctrls.createNewPropertyType
 );
 router.get("/", ctrls.getPropertyType);
-
+router.put(
+  "/:id",
+  verifyToken,
+  isAdmin,
+  validateDTO(
+    Joi.object({
+      name: string,
+      description: string,
+      image: string,
+    })
+  ),
+  ctrls.updatePropertyType
+);
+router.delete("/:id", verifyToken, isAdmin, ctrls.removePropertyType);
 module.exports = router;
