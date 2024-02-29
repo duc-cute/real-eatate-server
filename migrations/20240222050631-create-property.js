@@ -68,6 +68,13 @@ module.exports = {
       yearBuilt: {
         type: Sequelize.INTEGER,
       },
+      owner: {
+        type: Sequelize.UUID,
+        references: {
+          model: "Users",
+          key: "id",
+        },
+      },
 
       createdAt: {
         allowNull: false,

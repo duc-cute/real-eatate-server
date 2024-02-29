@@ -30,4 +30,5 @@ router.post(
   ctrls.signIn
 );
 
+router.post("/refresh-accesstoken", ctrls.refreshAccessToken);
 module.exports = router;
