@@ -22,6 +22,7 @@ const createNewPropertyType = asyncHandler(async (req, res) => {
 
 const getPropertyType = asyncHandler(async (req, res) => {
   const { limit, page, field, sort, name, ...query } = req.query;
+  console.log("req", req.query);
   let options = {};
   if (name) query.name = { [Op.iLike]: `%${name}%` };
 
@@ -44,18 +45,18 @@ const getPropertyType = asyncHandler(async (req, res) => {
   }
 
   if (!limit) {
-    const alreadyGetAll = await redis.get("get-property-type");
-    if (alreadyGetAll)
-      return res.json({
-        success: true,
-        mes: "Got",
-        propertyType: JSON.parse(alreadyGetAll),
-      });
+    // const alreadyGetAll = await redis.get("get-property-type");
+    // if (alreadyGetAll)
+    //   return res.json({
+    //     success: true,
+    //     mes: "Got",
+    //     propertyType: JSON.parse(alreadyGetAll),
+    //   });
     const response = await db.PropertyType.findAll({
       where: query,
       ...options,
     });
-    await redis.set("get-property-type", JSON.stringify(response));
+    // await redis.set("get-property-type", JSON.stringify(response));
 
     return res.json({
       success: response.length > 0,
@@ -70,6 +71,8 @@ const getPropertyType = asyncHandler(async (req, res) => {
     where: query,
     ...options,
   });
+
+  console.log("response", response);
   return res.json({
     success: response.length > 0,
     mes: response.length > 0 ? "Got" : "Cannot get property type",

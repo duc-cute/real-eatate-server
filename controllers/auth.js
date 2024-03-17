@@ -23,8 +23,7 @@ const register = asyncHandler(async (req, res) => {
     const roleCode = ["ROL7"];
     if (req?.body?.roleCode) roleCode.push(req.body?.roleCode);
     const roleCodeBulk = roleCode.map((role) => ({ userId, roleCode: role }));
-    console.log("roleCodeBulk", roleCodeBulk);
-    const updateRole = await db.User_Role.bulkCreate(roleCodeBulk);
+    await db.User_Role.bulkCreate(roleCodeBulk);
   }
 
   return res.json({
@@ -46,14 +45,14 @@ const signIn = asyncHandler(async (req, res) => {
 
   if (!isMatchingPassword)
     return throwErrorWithStatus(401, "Phone or Password incorrect!", res, next);
-  // const roles = await db.User_Role.findAll({
-  //   where: {
-  //     userId: user.dataValues.id,
-  //   },
-  //   attributes: ["roleCode"],
-  // });
+  const roles = await db.User_Role.findAll({
+    where: {
+      userId: user.dataValues.id,
+    },
+    attributes: ["roleCode"],
+  });
 
-  const accessToken = generateAccessToken(user.id);
+  const accessToken = generateAccessToken(user.id, roles);
   const newRefreshToken = generateRefreshToken(user.id);
   await db.User.update(
     { refreshToken: newRefreshToken },

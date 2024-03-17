@@ -8,8 +8,8 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.literal("gen_random_uuid()"),
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING,
@@ -28,7 +28,7 @@ module.exports = {
         allowNull: false,
       },
       propertyTypeId: {
-        type: Sequelize.UUID,
+        type: Sequelize.INTEGER,
         references: {
           model: "PropertyTypes",
           key: "id",
@@ -46,7 +46,7 @@ module.exports = {
         defaultValue: true,
       },
       postedBy: {
-        type: Sequelize.UUID,
+        type: Sequelize.INTEGER,
         references: {
           model: "Users",
           key: "id",
@@ -69,7 +69,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       owner: {
-        type: Sequelize.UUID,
+        type: Sequelize.INTEGER,
         references: {
           model: "Users",
           key: "id",
