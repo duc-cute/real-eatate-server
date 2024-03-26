@@ -11,6 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Property.belongsTo(models.User, {
+        foreignKey: "owner",
+        as: "rOwner",
+      });
+      Property.belongsTo(models.User, {
+        foreignKey: "postedBy",
+        as: "rPostedBy",
+      });
     }
   }
   Property.init(
@@ -45,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       propertySize: DataTypes.FLOAT,
       yearBuilt: DataTypes.INTEGER,
       owner: DataTypes.UUID,
+      address: DataTypes.STRING,
     },
     {
       sequelize,

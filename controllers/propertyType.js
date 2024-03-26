@@ -5,6 +5,7 @@ const db = require("../models");
 const redis = require("../config/redis.config");
 const { Op } = require("sequelize");
 const { throwErrorWithStatus } = require("../middlewares/errHandler");
+const generateKeyRedis = require("../utils/fn");
 
 const createNewPropertyType = asyncHandler(async (req, res) => {
   const { name } = req.body;
@@ -44,19 +45,23 @@ const getPropertyType = asyncHandler(async (req, res) => {
     else options.attributes = attributes;
   }
 
+  const filter = {
+    where: query,
+    ...options,
+  };
+
   if (!limit) {
-    // const alreadyGetAll = await redis.get("get-property-type");
-    // if (alreadyGetAll)
-    //   return res.json({
-    //     success: true,
-    //     mes: "Got",
-    //     propertyType: JSON.parse(alreadyGetAll),
-    //   });
-    const response = await db.PropertyType.findAll({
-      where: query,
-      ...options,
-    });
-    // await redis.set("get-property-type", JSON.stringify(response));
+    const keys = generateKeyRedis(filter);
+    const alreadyGetAll = await redis.get(keys);
+    if (alreadyGetAll)
+      return res.json({
+        success: true,
+        mes: "Got",
+        propertyType: JSON.parse(alreadyGetAll),
+      });
+    const response = await db.PropertyType.findAll({ ...filter });
+    await redis.set(keys, JSON.stringify(response));
+    redis.expireAt(keys, parseInt(+new Date() / 1000) + 86400);
 
     return res.json({
       success: response.length > 0,
@@ -72,7 +77,6 @@ const getPropertyType = asyncHandler(async (req, res) => {
     ...options,
   });
 
-  console.log("response", response);
   return res.json({
     success: response.length > 0,
     mes: response.length > 0 ? "Got" : "Cannot get property type",

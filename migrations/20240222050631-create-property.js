@@ -52,6 +52,10 @@ module.exports = {
           key: "id",
         },
       },
+      address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       thumb: {
         type: Sequelize.STRING,
         allowNull: false,

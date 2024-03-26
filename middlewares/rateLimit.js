@@ -1,25 +1,32 @@
 /** @format */
 
 const redis = require("../config/redis.config");
+const generateKeyRedis = require("../utils/fn");
 const rateLimit = async (req, res, next) => {
-  const clientId = req.headers?.client_id;
+  const clientId = generateKeyRedis("");
   const currentTime = Date.now();
 
   const client = await redis.hGetAll(`ratelimit-${clientId}`);
-  console.log("client", client);
-  console.log("count", client.count);
   if (Object.keys(client).length === 0) {
-    console.log("lot");
     await redis.hSet(`ratelimit-${clientId}`, "createdAt", currentTime);
     await redis.hSet(`ratelimit-${clientId}`, "count", 1);
+    redis.expireAt(
+      `ratelimit-${clientId}`,
+      parseInt(+new Date() / 1000) + 86400
+    );
+
     return next();
   }
 
   const distance = (currentTime - client.createdAt) / 1000;
-  console.log("distance", distance);
   if (distance > process.env.RATE_LIMIT_TIME) {
     await redis.hSet(`ratelimit-${clientId}`, "createdAt", currentTime);
     await redis.hSet(`ratelimit-${clientId}`, "count", 1);
+    redis.expireAt(
+      `ratelimit-${clientId}`,
+      parseInt(+new Date() / 1000) + 86400
+    );
+
     return next();
   }
   if (client.count > process.env.RATE_LIMIT_COUNT) {
@@ -29,6 +36,11 @@ const rateLimit = async (req, res, next) => {
     });
   } else {
     await redis.hSet(`ratelimit-${clientId}`, "count", +client.count + 1);
+    redis.expireAt(
+      `ratelimit-${clientId}`,
+      parseInt(+new Date() / 1000) + 86400
+    );
+
     return next();
   }
 };

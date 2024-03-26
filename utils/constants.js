@@ -126,6 +126,7 @@ module.exports = {
     price: faker.number.int({ min: 1000, max: 100000 }),
     propertyTypeId: faker.number.int({ min: 1, max: 3 }),
     status: "PENDING",
+    address: faker.location.streetAddress({ useFullAddress: true }),
     images: JSON.stringify(
       Array.from(Array(faker.number.int({ min: 3, max: 6 })).keys()).map(() =>
         faker.image.urlLoremFlickr({
